@@ -1,0 +1,58 @@
+=pod
+
+=head1 DBIx::ORMapper::Migration - Migrations for DBIx::ORMapper
+
+This is (like DBIx::ORMapper, too) in early development stage.
+
+=head1 Example
+
+Configuration File:
+
+ # conf/migration.yml
+ database:
+   type: MySQL
+   host: localhost
+   schema: foo
+   username: bar
+   password: baz
+    
+ directory: "migr"
+
+
+Migration Scripts are located in the "migr" directory (this is configurable).
+
+ # migr/00001_init.pm
+ package init;
+   
+ use DBIx::ORMapper::Migration;
+ use base qw(DBIx::ORMapper::Migration);
+    
+ sub up {
+    
+    create_table {
+       my $t = shift;
+    
+       $t->name("foo");
+    
+       $t->string("name", size => 100, default => 'hi');
+       $t->string("city");
+       $t->text("content");
+    };
+   
+    add_column "foo", part_number => "string";
+    
+    add_index "foo", "part_number";
+ }
+   
+ sub down {
+  
+    drop_column "foo", "part_number";
+    drop_table "foo";
+  
+ }
+  
+ 1;
+
+You can than run the migrations by executing I<dbix-ormapper-migrate --config path/to/configuration/file.yml [--up] [--down]>.
+
+I<--up> will execute the files in ascending order. I<--down> will execute the files in descending order.

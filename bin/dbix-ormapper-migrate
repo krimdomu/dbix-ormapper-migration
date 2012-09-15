@@ -1,0 +1,111 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Exception::Class;
+use YAML;
+
+use DBIx::ORMapper;
+use DBIx::ORMapper::Migration;
+
+my %opts = ();
+GetOptions(\%opts, "config=s", "up", "down");
+
+if(! exists $opts{config}) {
+   print STDERR "--config parameter not defined. Using default conf/migration.yml.\n";
+   $opts{config} = "conf/migration.yml";
+}
+
+if(! -f $opts{config}) {
+   print STDERR "Configuration not found.\n";
+   print STDERR "Pleae create a configuration file.\n";
+
+   exit 1;
+}
+
+if(! exists $opts{up} && ! exists $opts{down}) {
+   $opts{up} = 1;
+}
+
+my $yaml_file = eval { local(@ARGV, $/) = ($opts{config}); <>; };
+my $conf = Load($yaml_file);
+
+if(! exists $conf->{database}) {
+   print STDERR "No Database configured.\n";
+   print STDERR "You have to configure your database.\n";
+
+   exit 2;
+}
+
+my $url = $conf->{database}->{type} . "://" 
+               . $conf->{database}->{host}
+               . "/"
+               . $conf->{database}->{schema}
+               . "?username="
+               . $conf->{database}->{username}
+               . "&password="
+               . $conf->{database}->{password};
+
+if(exists $conf->{database}->{utf8} && $conf->{database}->{utf8}) {
+   $url .= "&characterEncoding=UTF-8";
+}
+
+my $db_class = "DBIx::ORMapper::Adapter::" . $conf->{database}->{type};
+eval "use $db_class;";
+if($@) {
+   print STDERR "Failed loading $db_class\n";
+   exit 3;
+}
+
+DBIx::ORMapper::setup(default => $url);
+
+eval {
+   $::db = DBIx::ORMapper::get_connection("default");
+   $::db->connect;
+};
+
+my $e;
+if($e = Exception::Class->caught()) {
+   print STDERR $e->error . "\n";
+   print STDERR $e->trace->as_string . "\n";
+   exit 5;
+}
+
+opendir(my $dir, $conf->{directory}) or die($!);
+my @content = ();
+while(my $entry = readdir($dir)) {
+   next if($entry =~ m/^\./);
+   push @content, $entry;
+}
+closedir($dir);
+
+my @sorted;
+
+if($opts{up}) {
+   print "  -- Running up()\n";
+   @sorted = sort { $a cmp $b } @content;
+}
+elsif($opts{down}) {
+   print "  -- Running down()\n";
+   @sorted = sort { $b cmp $a } @content;
+}
+
+for my $entry (@sorted) {
+   my ($num, $name) = split(/_/, $entry, 2);
+   $name =~ s/\.p[lm]$//;
+   print "     [$num] $name\n";
+
+   require $conf->{directory} . "/" . $entry;
+   my $klass = $name->new;
+
+   if($opts{up}) {
+      $klass->up;
+   }
+
+   elsif($opts{down}) {
+      $klass->down;
+   }
+}
+
