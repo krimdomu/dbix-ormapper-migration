@@ -114,18 +114,17 @@ eval {
       my $stmt = $tbl->get_statement;
       $stmt->execute;
 
-      my $md = Metadata->new(
+      $migr_state = Metadata->new(
          id => 1,
          version => 0,
       );
-      $md->save;
+      $migr_state->save;
 
    } or do {
       print STDERR "Can't create metadata table. This table is needed to track the migrations.\n$@\n";
       exit 6;
    };
 };
-
 
 my @sorted;
 
@@ -140,19 +139,40 @@ elsif($opts{down}) {
 
 for my $entry (@sorted) {
    my ($num, $name) = split(/_/, $entry, 2);
+
    $name =~ s/\.p[lm]$//;
-   print "     [$num] $name\n";
 
    require $conf->{directory} . "/" . $entry;
    my $klass = $name->new;
 
    if($opts{up}) {
-      $klass->up;
+      if(int($num) <= $migr_state->version) {
+         next;
+      }
+
+      print "     [$num] $name\n";
+      eval {
+         $klass->up;
+         $migr_state->version = int($num);
+         $migr_state->update;
+      } or do {
+         print STDERR "ERR: $@\n";
+      };
    }
 
    elsif($opts{down}) {
-      $klass->down;
+      if(int($num) > $migr_state->version) {
+         next;
+      }
+
+      print "     [$num] $name\n";
+      eval {
+         $klass->down;
+         $migr_state->version = int($num);
+         $migr_state->update;
+      };
    }
+
 }
 
 
