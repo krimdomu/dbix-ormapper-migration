@@ -1,4 +1,18 @@
-#!perl
+#!/usr/bin/env perl
+
+package Metadata;
+
+use base qw(DBIx::ORMapper::DM::DataSource::Table);
+
+__PACKAGE__->attr('id', 'Integer');
+__PACKAGE__->attr('version', 'Integer');
+
+__PACKAGE__->table('metadata');
+__PACKAGE__->primary_key('id');
+
+1;
+
+package main;
 
 use strict;
 use warnings;
@@ -6,8 +20,10 @@ use warnings;
 use Getopt::Long;
 use Exception::Class;
 use YAML;
+use Data::Dumper;
 
 use DBIx::ORMapper;
+use DBIx::ORMapper::DM;
 use DBIx::ORMapper::Migration;
 
 my %opts = ();
@@ -64,6 +80,8 @@ DBIx::ORMapper::setup(default => $url);
 eval {
    $::db = DBIx::ORMapper::get_connection("default");
    $::db->connect;
+
+   Metadata->set_data_source($::db);
 };
 
 my $e;
@@ -80,6 +98,32 @@ while(my $entry = readdir($dir)) {
    push @content, $entry;
 }
 closedir($dir);
+
+# check if metadata table exists
+my $migr_state;
+eval {
+   $migr_state = Metadata->find(1);
+} or do {
+   eval {
+      my $tbl = DBIx::ORMapper::Migration::Table->new;
+      $tbl->name("metadata");
+      $tbl->integer("id");
+      $tbl->integer("version");
+      my $stmt = $tbl->get_statement;
+      $stmt->execute;
+
+      my $md = Metadata->new(
+         id => 1,
+         version => 0,
+      );
+      $md->save;
+
+   } or do {
+      print STDERR "Can't create metadata table. This table is needed to track the migrations.\n$@\n";
+      exit 6;
+   };
+};
+
 
 my @sorted;
 
@@ -108,4 +152,6 @@ for my $entry (@sorted) {
       $klass->down;
    }
 }
+
+
 
