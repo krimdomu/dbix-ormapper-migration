@@ -109,6 +109,8 @@ eval {
       $tbl->name("metadata");
       $tbl->integer("id");
       $tbl->integer("version");
+      $tbl->primary_key("id");
+
       my $stmt = $tbl->get_statement;
       $stmt->execute;
 
