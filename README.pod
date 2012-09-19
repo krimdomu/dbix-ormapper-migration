@@ -34,9 +34,12 @@ Migration Scripts are located in the "migr" directory (this is configurable).
     
        $t->name("foo");
     
+       $t->integer("id");
        $t->string("name", size => 100, default => 'hi');
        $t->string("city");
        $t->text("content");
+        
+       $t->primary_key("id");
     };
    
     add_column "foo", part_number => "string";
