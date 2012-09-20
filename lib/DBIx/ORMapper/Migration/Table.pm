@@ -33,7 +33,7 @@ sub new {
       $stmt = $stmt->end();
 
       if($self->{'__primary_key'}) {
-         $stmt = $stmt->primary_key($self->{'__primary_key'});
+         $stmt = $stmt->primary_key(@{ $self->{'__primary_key'} });
       }
 
       return $::db->get_statement($stmt);
@@ -114,8 +114,8 @@ sub get_statement {
 }
 
 sub primary_key {
-   my ($self, $key) = @_;
-   $self->{__primary_key} = $key;
+   my ($self, @keys) = @_;
+   $self->{__primary_key} = \@keys;
 }
 
 sub AUTOLOAD {
