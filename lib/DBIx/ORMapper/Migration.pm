@@ -19,7 +19,10 @@ require Exporter;
 use base qw(Exporter);
 
 use vars qw(@EXPORT);
-@EXPORT = qw(create_table drop_table add_column drop_column add_index drop_index sql);
+@EXPORT = qw(
+               create_table drop_table add_column drop_column add_index drop_index sql
+               NULL FALSE TRUE
+            );
 
 sub new {
    my $that = shift;
@@ -114,5 +117,9 @@ sub drop_index {
 
 sub sql {
 }
+
+sub NULL { return undef; }
+sub TRUE { return 1; }
+sub FALSE { return 0; }
 
 1;
