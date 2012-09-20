@@ -168,7 +168,7 @@ for my $entry (@sorted) {
       print "     [$num] $name\n";
       eval {
          $klass->down;
-         $migr_state->version = int($num);
+         $migr_state->version = int($num)-1;
          $migr_state->update;
       };
    }
