@@ -106,6 +106,22 @@ sub add_index {
    };
 }
 
+sub change_column {
+   my ($self, $col_name, $col_type, $col_opts) = @_;
+
+   $self->{'__get_statement__'} = sub {
+      my $self = shift;
+      my $stmt = ALTER()
+                  ->table($self->{name})
+                     ->modify()
+                        ->column()
+                           ->$col_name($col_type, %{ $col_opts })
+                        ->end();
+
+      return $::db->get_statement($stmt);
+   };
+}
+
 sub get_statement {
    my ($self) = @_;
 

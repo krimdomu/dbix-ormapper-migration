@@ -20,7 +20,7 @@ use base qw(Exporter);
 
 use vars qw(@EXPORT);
 @EXPORT = qw(
-               create_table drop_table add_column drop_column add_index drop_index sql
+               create_table drop_table add_column drop_column add_index drop_index sql change_column
                NULL FALSE TRUE
             );
 
@@ -72,6 +72,22 @@ sub add_column {
       my $t = shift;
       $t->name($table);
       $t->add_column($col_name, $col_type, $col_opts);
+   };
+
+   &$code($t);
+
+   my $stmt = $t->get_statement();
+   $stmt->execute;
+}
+
+sub change_column {
+   my ($table, $col_name, $col_type, $col_opts) = @_;
+   my $t = DBIx::ORMapper::Migration::Table->new;
+
+   my $code = sub {
+      my $t = shift;
+      $t->name($table);
+      $t->change_column($col_name, $col_type, $col_opts);
    };
 
    &$code($t);
