@@ -120,6 +120,8 @@ eval {
       );
       $migr_state->save;
 
+      return 1;
+
    } or do {
       print STDERR "Can't create metadata table. This table is needed to track the migrations.\n$@\n";
       exit 6;
