@@ -102,7 +102,7 @@ closedir($dir);
 # check if metadata table exists
 my $migr_state;
 eval {
-   $migr_state = Metadata->find(1);
+   $migr_state = Metadata->all(Metadata->id == 1)->next;
 } or do {
    eval {
       my $tbl = DBIx::ORMapper::Migration::Table->new;
