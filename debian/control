@@ -1,0 +1,25 @@
+Source: libdbix-ormapper-migration-perl
+Section: admin
+Priority: optional
+Maintainer: Jan Gehring <jan.gehring@gmail.com>
+Build-Depends: debhelper (>= 7),
+                  perl (>= 5.10.0),
+                  libexception-class-perl,
+                  libdbi-perl,
+                  libwww-perl,
+                  libwant-perl,
+                  libyaml-perl
+Standards-Version: 3.9.1
+Homepage: http://github.com/krimdomu/dbix-ormapper
+
+Package: libdbix-ormapper-migration-perl
+Architecture: all
+Depends: ${misc:Depends},
+            ${perl:Depends},
+            libwww-perl,
+            libexception-class-perl,
+            libdbi-perl,
+            libwant-perl,
+            libyaml-perl
+Description: DBIx::ORMapper::Migration
+ Migrations for DBIx::ORMapper

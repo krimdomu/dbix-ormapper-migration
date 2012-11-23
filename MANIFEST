@@ -1,0 +1,7 @@
+bin/dbix-ormapper-migrate
+lib/DBIx/ORMapper/Migration.pm
+lib/DBIx/ORMapper/Migration/Table.pm
+Makefile.PL
+MYMETA.json
+MYMETA.yml
+t/basic.t
