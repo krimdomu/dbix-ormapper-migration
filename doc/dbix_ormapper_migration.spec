@@ -1,7 +1,7 @@
 %define perl_vendorlib %(eval "`%{__perl} -V:installvendorlib`"; echo $installvendorlib)
 %define perl_vendorarch %(eval "`%{__perl} -V:installvendorarch`"; echo $installvendorarch)
 
-%define real_name DBIx::ORMapper::Migration
+%define real_name DBIx-ORMapper-Migration
 
 Summary: DBIx::ORMapper::Migration Migrations for DBIx::ORMapper
 Name: perl-DBIx-ORMapper-Migration
@@ -9,7 +9,7 @@ Version: 0.0.1
 Release: 1
 License: Artistic
 Group: Utilities/System
-Source: http://github.com/krimdomu/dbix-ormapper-migration/
+Source: http://github.com/krimdomu/dbix-ormapper-migration/DBIx-ORMapper-Migration-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: perl >= 5.10.1
@@ -45,7 +45,7 @@ find %{buildroot} -name .packlist -exec %{__rm} {} \;
 %files
 %defattr(-,root,root, 0755)
 %doc META.yml 
-%doc %{_mandir}/*
+#%doc %{_mandir}/*
 %{_bindir}/*
 %{perl_vendorlib}/*
 
