@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 
 package Metadata;
 
@@ -45,8 +45,21 @@ if(! exists $opts{up} && ! exists $opts{down}) {
    $opts{up} = 1;
 }
 
-my $yaml_file = eval { local(@ARGV, $/) = ($opts{config}); <>; };
-my $conf = Load($yaml_file);
+my $content = eval { local(@ARGV, $/) = ($opts{config}); <>; };
+my $conf = {};
+
+if($opts{config} =~ m/\.yml$/) {
+   $conf = Load($content);
+}
+else {
+   $conf  = eval 'package DBIx::ORMapper::Migration::Config::Loader;'
+                        . "no warnings; $content";
+
+   die "Couldn't load configuration file: $@" if(!$conf && $@);
+   die "Config file invalid. Did not return HASH reference." if( ref($conf) ne "HASH" );
+
+   $conf->{directory} = $conf->{database}->{migration_directory};
+}
 
 if(! exists $conf->{database}) {
    print STDERR "No Database configured.\n";
