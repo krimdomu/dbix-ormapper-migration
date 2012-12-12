@@ -5,7 +5,7 @@
 
 Summary: DBIx::ORMapper::Migration Migrations for DBIx::ORMapper
 Name: perl-DBIx-ORMapper-Migration
-Version: 0.0.1
+Version: 0.0.2
 Release: 1
 License: Artistic
 Group: Utilities/System
@@ -51,5 +51,5 @@ find %{buildroot} -name .packlist -exec %{__rm} {} \;
 
 %changelog
 
-* Fri Nov 23 2012 Jan Gehring <jan.gehring at, gmail.com> 0.0.1-1
+* Fri Nov 23 2012 Jan Gehring <jan.gehring at, gmail.com> 0.0.2-1
 - initial build
